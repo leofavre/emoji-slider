@@ -1,0 +1,13 @@
+body {
+  margin: 20px;
+  background-color: #444;
+}
+
+body > * {
+  margin: 20px;
+  vertical-align: top;
+}
+
+img {
+  width: 320px;
+}

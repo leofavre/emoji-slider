@@ -1,0 +1,103 @@
+:host {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: sans-serif;
+  font-size: 19px;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+
+  display: inline-flex;
+  flex-flow: column nowrap;
+  align-items: center;
+
+  min-width: 11em;
+  padding: 1.5em 1.625em 2.325em;
+  border-radius: 0.5em;
+
+  color: #909;
+  background: #fff;
+
+  user-select: none;
+}
+
+div {
+  position: relative;
+  margin-top: 1.85em;
+  width: 100%;
+}
+
+.floater {
+  display: block;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+	0% {
+		transform: translateY(-0.15em);
+	}
+	50% {
+		transform: translateY(0.15em);
+	}
+	100% {
+		transform: translateY(-0.15em);
+	}
+}
+
+.emoji {
+  position: absolute;
+  cursor: pointer;
+  user-select: none;
+
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+
+  left: 0%; /* changed by javascript */
+  width: 0;
+  height: 0;
+
+  font-size: 2em;
+  z-index: 2;
+}
+
+.emoji_thumb {
+  top: 50%;
+  align-items: center;
+}
+
+.emoji_scale {
+  bottom: 0.35em; /* changed by javascript */
+  align-items: flex-end;
+  opacity: 0;
+  transition: opacity 0s 1s; /* changed by javascript */
+}
+
+.emoji_active.emoji_scale {
+  opacity: 1;
+  transition: opacity 0s;
+}
+
+.bar {
+  position: relative;
+	display: block;
+	width: 100%;
+	height: 0.5em;
+  border-radius: 0.5em;
+  overflow: hidden;
+}
+
+.bar__area {
+  position: absolute;
+  top: 0;
+  height: 100%;
+}
+
+.bar__area_right {
+  right: 0;
+  background: #d9d9d9;
+}
+
+.bar__area_left {
+  left: 0;
+  background: #909;
+}
