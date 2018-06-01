@@ -1,1 +1,5 @@
-export class EmojiSlider {};
+export class EmojiSlider {
+  constructor () {
+    
+  }
+};
