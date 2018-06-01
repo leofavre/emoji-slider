@@ -5,6 +5,6 @@ export class EmojiSlider extends HTMLElement {
   }
 
   static get observedAttributes () {
-
+    return ['rate'];
   }
 };
