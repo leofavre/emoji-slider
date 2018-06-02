@@ -51,6 +51,20 @@
 	height: 8px;
 }
 
+.input {
+  -webkit-appearance: none;
+
+  position: absolute;
+  top: -13px;
+  left: -8px;
+  margin: 0;
+  width: calc(100% + 16px);
+  height: 32px;
+  opacity: 0;
+  z-index: 5;
+  cursor: pointer;
+}
+
 .slider,
 .area {
   position: absolute;

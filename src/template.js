@@ -7,6 +7,7 @@ template.innerHTML = `
   <div class="root">
     <slot></slot>
     <div class="bar">
+      <input class="input" type="range" min="0" max="100" step="0.1">
       <div class="thumb">
         <div class="floater">
           <div class="emoji emoji_scaled"></div>

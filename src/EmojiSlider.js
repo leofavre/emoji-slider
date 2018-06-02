@@ -12,16 +12,12 @@ export class EmojiSlider extends HTMLElement {
     const select = str => this.shadowRoot.querySelector(`.${str}`);
 
     this.$root = select('root');
+    this.$input = select('input');
     this.$emojiThumb = select('thumb');
     this.$emojiFixed = select('emoji_fixed');
     this.$emojiScale = select('emoji_scaled');
     this.$sliderLeft = select('area_left');
     this.$sliderRight = select('area_right');
-
-    this.handleSlideStart = this.handleSlideStart.bind(this);
-    this.handleSlide = this.handleSlide.bind(this);
-    this.handleSlideEnd = this.handleSlideEnd.bind(this);
-    this.removeTheme = this.removeTheme.bind(this);
   }
 
   static get observedAttributes () {
@@ -34,6 +30,14 @@ export class EmojiSlider extends HTMLElement {
 
   set rate (value) {
     this.setAttribute('rate', value);
+  }
+
+  get emoji () {
+    return this.getAttribute('emoji') || '😍';
+  }
+
+  set emoji (value) {
+    this.setAttribute('emoji', value);
   }
 
   attributeChangedCallback (attrName, oldValue, newValue) {
@@ -49,7 +53,10 @@ export class EmojiSlider extends HTMLElement {
   }
 
   connectedCallback () {
-    this.$emojiThumb.addEventListener('mousedown', this.handleSlideStart);
+    this.$input.addEventListener('mousedown', this.handleSlideStart.bind(this));
+    this.$input.addEventListener('input', this.handleSlide.bind(this));
+    this.$input.addEventListener('mouseup', this.handleSlideEnd.bind(this));
+    this.$input.value = this.rate;
 
     this.updateEmoji();
     this.updateRate();
@@ -102,21 +109,20 @@ export class EmojiSlider extends HTMLElement {
 
     const luminance = getLuminance(bgColor);
 
-    THEMES.forEach(this.removeTheme);
+    THEMES.forEach(this.removeTheme.bind(this));
 
     if (luminance < 95) {
-      this.applyTheme('dark');
+      this.applyTheme(THEMES[2]);
     } else if (luminance < 190) {
-      this.applyTheme('light');
+      this.applyTheme(THEMES[1]);
     } else {
-      this.applyTheme('white');
+      this.applyTheme(THEMES[0]);
     }
   }
 
   updateEmoji () {
-    const emoji = this.getAttribute('emoji') || '😍';
-    this.$emojiFixed.innerHTML = emoji;
-    this.$emojiScale.innerHTML = emoji;
+    this.$emojiFixed.innerHTML = this.emoji;
+    this.$emojiScale.innerHTML = this.emoji;
   }
 
   updateRate () {
@@ -126,8 +132,11 @@ export class EmojiSlider extends HTMLElement {
     this.$emojiScale.style = '';
     this.$emojiScale.style.fontSize = `${32 + this.rate}px`;
 
-    this.$sliderLeft.style.clipPath = `polygon(0 0, ${this.rate}% 0, ${this.rate}% 100%, 0% 100%)`;
-    this.$sliderRight.style.clipPath = `polygon(${this.rate}% 0, 100% 0, 100% 100%, ${this.rate}% 100%)`;
+    this.$sliderLeft.style.clipPath =
+      `polygon(0 0, ${this.rate}% 0, ${this.rate}% 100%, 0% 100%)`;
+
+    this.$sliderRight.style.clipPath =
+      `polygon(${this.rate}% 0, 100% 0, 100% 100%, ${this.rate}% 100%)`;
   }
 
   dispatchEventAndMethod (evtName, detail) {
@@ -146,35 +155,22 @@ export class EmojiSlider extends HTMLElement {
   }
 
   handleSlideStart (evt) {
-    this.startX = evt.pageX;
-    this.startRate = this.rate;
-
     this.applyState('active');
-    document.addEventListener('mousemove', this.handleSlide);
-    document.addEventListener('mouseup', this.handleSlideEnd);
   }
 
   handleSlide (evt) {
-    const maxRangeInPixels = this.$root.offsetWidth;
-
-    const rate = this.startRate +
-      (100 * (evt.pageX - this.startX) / maxRangeInPixels);
-
-    this.rate = Math.min(100, Math.max(0, rate)).toFixed(1);
+    this.rate = evt.target.value;
   }
 
   handleSlideEnd (evt) {
     this.removeState('active');
-    this.dispatchEventAndMethod('rate', { rate: this.rate });
-    document.removeEventListener('mouseup', this.handleSlideEnd);
-    document.removeEventListener('mousemove', this.handleSlide);
+    this.dispatchEventAndMethod('rate', { rate: evt.target.value });
   }
 
   disconnectedCallback () {
-    this.removeState('started');
     this.stopObservingStyleChanges();
-    this.$emojiThumb.removeEventListener('mousedown', this.handleSlideStart);
-    document.removeEventListener('mouseup', this.handleSlideEnd);
-    document.removeEventListener('mousemove', this.handleSlide);
+    this.$input.removeEventListener('mousedown', this.handleSlideEnd);
+    this.$input.removeEventListener('input', this.handleSlide);
+    this.$input.removeEventListener('mouseup', this.handleSlideEnd);
   }
 }
