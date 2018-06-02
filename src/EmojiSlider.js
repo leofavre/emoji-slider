@@ -1,5 +1,5 @@
 import template from './template.js';
-import { getLuminance } from './helpers.js';
+import { getLuminance, getRotationInDeg } from './helpers.js';
 
 export class EmojiSlider extends HTMLElement {
   constructor () {
@@ -70,7 +70,7 @@ export class EmojiSlider extends HTMLElement {
 
     this.updateEmoji();
     this.updateRate();
-    this.updateTheme();
+    this.updateAppearance();
     this.observeStyleChange();
 
     setTimeout(() => {
@@ -89,7 +89,7 @@ export class EmojiSlider extends HTMLElement {
   observeStyleChange () {
     this.observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        this.updateTheme();
+        this.updateAppearance();
       });
     });
 
@@ -121,12 +121,20 @@ export class EmojiSlider extends HTMLElement {
     this.$root.classList.remove(`root_theme_${theme}`);
   }
 
-  updateTheme () {
-    const bgColor = window.getComputedStyle(this, null)
-      .getPropertyValue('background-color');
+  updateAppearance () {
+    const computedStyles = window.getComputedStyle(this, null);
 
+    /* update rotation */
+
+    const transform = computedStyles.getPropertyValue('transform');
+    const rotation = getRotationInDeg(transform);
+    this.$emojiThumb.style.transform = `rotate(${rotation * -1}deg)`;
+    this.$emojiFixed.style.transform = `rotate(${rotation}deg)`;
+
+    /* update theme */
+
+    const bgColor = computedStyles.getPropertyValue('background-color');
     const luminance = getLuminance(bgColor);
-
     const themes = this.constructor.availableThemes;
 
     themes.forEach(theme => {
@@ -148,12 +156,8 @@ export class EmojiSlider extends HTMLElement {
   }
 
   updateRate () {
-    this.$emojiThumb.style = '';
     this.$emojiThumb.style.left = `${this.rate}%`;
-
-    this.$emojiScale.style = '';
     this.$emojiScale.style.fontSize = `${32 + this.rate}px`;
-
     this.$sliderLeft.style.width = `${this.rate}%`;
     this.$sliderRight.style.width = `${100 - this.rate}%`;
   }
