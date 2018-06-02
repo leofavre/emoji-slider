@@ -17,8 +17,8 @@ template.innerHTML = `
         </div>
         <div class="emoji emoji_fixed"></div>
       </div>
+      <input class="input" type="range" min="0" max="100" step="0.1">
     </div>
-    <input class="input" type="range" min="0" max="100" step="0.1">
   </div>
 `;
 
