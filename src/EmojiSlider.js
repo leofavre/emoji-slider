@@ -10,6 +10,7 @@ export class EmojiSlider extends HTMLElement {
     const select = str => this.shadowRoot.querySelector(`.${str}`);
 
     this.$root = select('root');
+    this.$slider = select('input');
     this.$emojiThumb = select('thumb');
     this.$emojiFixed = select('emoji_fixed');
     this.$emojiScale = select('emoji_scaled');
