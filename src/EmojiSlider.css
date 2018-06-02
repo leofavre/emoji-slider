@@ -58,7 +58,7 @@
   margin: 0;
   width: calc(100% + 16px);
   height: 32px;
-  opacity: 0.3;
+  opacity: 0;
   cursor: pointer;
 }
 

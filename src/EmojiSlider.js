@@ -17,7 +17,6 @@ export class EmojiSlider extends HTMLElement {
     this.$sliderLeft = select('area_left');
     this.$sliderRight = select('area_right');
 
-    this.handleSlideStart = this.handleSlideStart.bind(this);
     this.handleSlide = this.handleSlide.bind(this);
     this.handleSlideEnd = this.handleSlideEnd.bind(this);
   }
@@ -59,7 +58,15 @@ export class EmojiSlider extends HTMLElement {
   }
 
   connectedCallback () {
-    this.$emojiThumb.addEventListener('mousedown', this.handleSlideStart);
+    this.$slider.addEventListener('input', this.handleSlide);
+    this.$slider.addEventListener('change', this.handleSlideEnd);
+    this.$slider.addEventListener('mouseout', this.handleSlideEnd);
+    this.$slider.addEventListener('touchend', this.handleSlideEnd);
+
+    this.upgradeProperty('rate');
+    this.upgradeProperty('emoji');
+
+    this.$slider.value = this.rate;
 
     this.updateEmoji();
     this.updateRate();
@@ -69,6 +76,14 @@ export class EmojiSlider extends HTMLElement {
     setTimeout(() => {
       this.applyState('started');
     }, 100);
+  }
+
+  upgradeProperty (propName) {
+    if (this.hasOwnProperty(propName)) {
+      let value = this[propName];
+      delete this[propName];
+      this[propName] = value;
+    }
   }
 
   observeStyleChange () {
@@ -161,36 +176,29 @@ export class EmojiSlider extends HTMLElement {
     }
   }
 
-  handleSlideStart (evt) {
-    this.startX = evt.pageX;
-    this.startRate = this.rate;
-
-    this.applyState('active');
-    document.addEventListener('mousemove', this.handleSlide);
-    document.addEventListener('mouseup', this.handleSlideEnd);
-  }
-
   handleSlide (evt) {
-    const maxRangeInPixels = this.$root.offsetWidth;
-
-    const rate = this.startRate +
-      (100 * (evt.pageX - this.startX) / maxRangeInPixels);
-
-    this.rate = Math.min(100, Math.max(0, rate)).toFixed(1);
+    this.applyState('active');
+    this.rate = evt.target.value;
   }
 
-  handleSlideEnd (evt) {
+  handleSlideEnd () {
     this.removeState('active');
-    this.dispatchEventAndMethod('rate', { rate: this.rate });
-    document.removeEventListener('mouseup', this.handleSlideEnd);
-    document.removeEventListener('mousemove', this.handleSlide);
+
+    if (this.rate !== this.previousRate) {
+      this.dispatchEventAndMethod('rate', {
+        rate: this.rate
+      });
+    }
+
+    this.previousRate = this.rate;
   }
 
   disconnectedCallback () {
     this.removeState('started');
     this.stopObservingStyleChanges();
-    this.$emojiThumb.removeEventListener('mousedown', this.handleSlideStart);
-    document.removeEventListener('mouseup', this.handleSlideEnd);
-    document.removeEventListener('mousemove', this.handleSlide);
+    this.$slider.removeEventListener('input', this.handleSlide);
+    this.$slider.removeEventListener('change', this.handleSlideEnd);
+    this.$slider.removeEventListener('mouseout', this.handleSlideEnd);
+    this.$slider.removeEventListener('touchend', this.handleSlideEnd);
   }
 }
