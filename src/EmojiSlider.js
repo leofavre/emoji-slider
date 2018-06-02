@@ -1,6 +1,8 @@
 import template from './template.js';
 import { getLuminance } from './helpers.js';
 
+const THEMES = [ 'white', 'light', 'dark' ];
+
 export class EmojiSlider extends HTMLElement {
   constructor () {
     super();
@@ -19,6 +21,7 @@ export class EmojiSlider extends HTMLElement {
     this.handleSlideStart = this.handleSlideStart.bind(this);
     this.handleSlide = this.handleSlide.bind(this);
     this.handleSlideEnd = this.handleSlideEnd.bind(this);
+    this.removeTheme = this.removeTheme.bind(this);
   }
 
   static get observedAttributes () {
@@ -50,30 +53,64 @@ export class EmojiSlider extends HTMLElement {
 
     this.updateEmoji();
     this.updateRate();
+    this.updateTheme();
+    this.observeStyleChange();
 
     setTimeout(() => {
-      this.$root.classList.add('root_started');
-      this.setTheme();
+      this.applyState('started');
     }, 100);
   }
 
-  setTheme () {
+  observeStyleChange () {
+    this.observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        this.updateTheme();
+      });
+    });
+
+    var observerConfig = {
+      attributes: true,
+      attributeFilter: ['style', 'class']
+    };
+
+    this.observer.observe(this, observerConfig);
+  }
+
+  stopObservingStyleChanges () {
+    this.observer.disconnect();
+  }
+
+  applyState (state) {
+    this.$root.classList.add(`root_${state}`);
+  }
+
+  removeState (state) {
+    this.$root.classList.remove(`root_${state}`);
+  }
+
+  applyTheme (theme) {
+    this.$root.classList.add(`root_theme_${theme}`);
+  }
+
+  removeTheme (theme) {
+    this.$root.classList.remove(`root_theme_${theme}`);
+  }
+
+  updateTheme () {
     const bgColor = window.getComputedStyle(this, null)
       .getPropertyValue('background-color');
 
     const luminance = getLuminance(bgColor);
 
-    let theme;
+    THEMES.forEach(this.removeTheme);
 
-    if (luminance < 112) {
-      theme = 'root_theme_dark';
-    } else if (luminance < 224) {
-      theme = 'root_theme_light';
+    if (luminance < 95) {
+      this.applyTheme('dark');
+    } else if (luminance < 190) {
+      this.applyTheme('light');
     } else {
-      theme = 'root_theme_white';
+      this.applyTheme('white');
     }
-
-    this.$root.classList.add(theme);
   }
 
   updateEmoji () {
@@ -112,7 +149,7 @@ export class EmojiSlider extends HTMLElement {
     this.startX = evt.pageX;
     this.startRate = this.rate;
 
-    this.$root.classList.add('root_active');
+    this.applyState('active');
     document.addEventListener('mousemove', this.handleSlide);
     document.addEventListener('mouseup', this.handleSlideEnd);
   }
@@ -127,15 +164,15 @@ export class EmojiSlider extends HTMLElement {
   }
 
   handleSlideEnd (evt) {
-    this.$root.classList.remove('root_active');
+    this.removeState('active');
     this.dispatchEventAndMethod('rate', { rate: this.rate });
-
     document.removeEventListener('mouseup', this.handleSlideEnd);
     document.removeEventListener('mousemove', this.handleSlide);
   }
 
   disconnectedCallback () {
-    this.$root.classList.remove('root_started');
+    this.removeState('started');
+    this.stopObservingStyleChanges();
     this.$emojiThumb.removeEventListener('mousedown', this.handleSlideStart);
     document.removeEventListener('mouseup', this.handleSlideEnd);
     document.removeEventListener('mousemove', this.handleSlide);
