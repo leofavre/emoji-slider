@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="./index.js"></script>
   <link rel="stylesheet" href="./index.css">
   <title>Emoji Slider</title>
 </head>
 <body>
   <emoji-slider>
-    Teste
+    Glowing eyes.
   </emoji-slider>
 
   <emoji-slider emoji="😱" rate="25">
@@ -17,7 +16,12 @@
   </emoji-slider>
 
   <emoji-slider emoji="👻" rate="50">
-    How are you feeling today?
+    Boo! I’m a ghost!
   </emoji-slider>
+
+  <script type="module">
+    import { EmojiSlider } from '../src/EmojiSlider.js';
+    window.customElements.define('emoji-slider', EmojiSlider);
+  </script>
 </body>
 </html>

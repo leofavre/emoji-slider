@@ -64,7 +64,7 @@ export class EmojiSlider extends HTMLElement {
 
     if (luminance < 112) {
       theme = 'wrapper_theme_dark';
-    } else if (luminance < 234) {
+    } else if (luminance < 224) {
       theme = 'wrapper_theme_light';
     } else {
       theme = 'wrapper_theme_white';
@@ -92,6 +92,21 @@ export class EmojiSlider extends HTMLElement {
     this.$barRight.style.width = `${100 - this.rate}%`;
   }
 
+  dispatchEventAndMethod (evtName, detail) {
+    const event = new CustomEvent(evtName, {
+      bubbles: true,
+      detail
+    });
+
+    const method = this[`on${evtName}`];
+
+    this.dispatchEvent(event);
+
+    if (typeof method === 'function') {
+      method(event);
+    }
+  }
+
   handleSlideStart (evt) {
     this.startX = evt.pageX;
     this.startRate = this.rate;
@@ -112,6 +127,8 @@ export class EmojiSlider extends HTMLElement {
 
   handleSlideEnd (evt) {
     this.$wrapper.classList.remove('wrapper_active');
+    this.dispatchEventAndMethod('rate', { rate: this.rate });
+
     document.removeEventListener('mouseup', this.handleSlideEnd);
     document.removeEventListener('mousemove', this.handleSlide);
   }
