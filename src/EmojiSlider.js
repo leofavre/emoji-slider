@@ -7,11 +7,14 @@ export class EmojiSlider extends HTMLElement {
     this.attachShadow({ mode: 'open' });
     this.shadowRoot.appendChild(template.content.cloneNode(true));
 
-    this.$wrapper = this.shadowRoot.querySelector('.wrapper');
-    this.$emojiThumb = this.shadowRoot.querySelector('.emoji__thumb');
-    this.$emojiScale = this.shadowRoot.querySelector('.emoji__scale');
-    this.$barLeft = this.shadowRoot.querySelector('.bar__area_left');
-    this.$barRight = this.shadowRoot.querySelector('.bar__area_right');
+    const select = str => this.shadowRoot.querySelector(`.${str}`);
+
+    this.$root = select('root');
+    this.$emojiThumb = select('thumb');
+    this.$emojiFixed = select('emoji_fixed');
+    this.$emojiScale = select('emoji_scaled');
+    this.$barLeft = select('slider_left');
+    this.$barRight = select('slider_right');
 
     this.handleSlideStart = this.handleSlideStart.bind(this);
     this.handleSlide = this.handleSlide.bind(this);
@@ -49,7 +52,7 @@ export class EmojiSlider extends HTMLElement {
     this.updateRate();
 
     setTimeout(() => {
-      this.$wrapper.classList.add('wrapper_started');
+      this.$root.classList.add('root_started');
       this.setTheme();
     }, 100);
   }
@@ -63,19 +66,19 @@ export class EmojiSlider extends HTMLElement {
     let theme;
 
     if (luminance < 112) {
-      theme = 'wrapper_theme_dark';
+      theme = 'root_theme_dark';
     } else if (luminance < 224) {
-      theme = 'wrapper_theme_light';
+      theme = 'root_theme_light';
     } else {
-      theme = 'wrapper_theme_white';
+      theme = 'root_theme_white';
     }
 
-    this.$wrapper.classList.add(theme);
+    this.$root.classList.add(theme);
   }
 
   updateEmoji () {
     const emoji = this.getAttribute('emoji') || '😍';
-    this.$emojiThumb.innerHTML = emoji;
+    this.$emojiFixed.innerHTML = emoji;
     this.$emojiScale.innerHTML = emoji;
   }
 
@@ -84,9 +87,7 @@ export class EmojiSlider extends HTMLElement {
     this.$emojiThumb.style.left = `${this.rate}%`;
 
     this.$emojiScale.style = '';
-    this.$emojiScale.style.left = `${this.rate}%`;
-    this.$emojiScale.style.bottom = `${0.5 - (0.5 * this.rate / 100)}em`;
-    this.$emojiScale.style.fontSize = `${2 + this.rate / 20}em`;
+    this.$emojiScale.style.fontSize = `${32 + this.rate}px`;
 
     this.$barLeft.style.width = `${this.rate}%`;
     this.$barRight.style.width = `${100 - this.rate}%`;
@@ -111,13 +112,13 @@ export class EmojiSlider extends HTMLElement {
     this.startX = evt.pageX;
     this.startRate = this.rate;
 
-    this.$wrapper.classList.add('wrapper_active');
+    this.$root.classList.add('root_active');
     document.addEventListener('mousemove', this.handleSlide);
     document.addEventListener('mouseup', this.handleSlideEnd);
   }
 
   handleSlide (evt) {
-    const maxRangeInPixels = this.$wrapper.offsetWidth;
+    const maxRangeInPixels = this.$root.offsetWidth;
 
     const rate = this.startRate +
       (100 * (evt.pageX - this.startX) / maxRangeInPixels);
@@ -126,7 +127,7 @@ export class EmojiSlider extends HTMLElement {
   }
 
   handleSlideEnd (evt) {
-    this.$wrapper.classList.remove('wrapper_active');
+    this.$root.classList.remove('root_active');
     this.dispatchEventAndMethod('rate', { rate: this.rate });
 
     document.removeEventListener('mouseup', this.handleSlideEnd);
@@ -134,7 +135,7 @@ export class EmojiSlider extends HTMLElement {
   }
 
   disconnectedCallback () {
-    this.$wrapper.classList.remove('wrapper_started');
+    this.$root.classList.remove('root_started');
     this.$emojiThumb.removeEventListener('mousedown', this.handleSlideStart);
     document.removeEventListener('mouseup', this.handleSlideEnd);
     document.removeEventListener('mousemove', this.handleSlide);

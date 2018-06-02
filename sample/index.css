@@ -1,6 +1,7 @@
 body {
-  margin: 20px;
+  margin: 320px;
   background-color: #444;
+  text-align: center;
 }
 
 body > * {
