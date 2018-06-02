@@ -13,6 +13,10 @@ img {
   width: 320px;
 }
 
+emoji-slider:nth-of-type(1) {
+  transform: rotate(-12deg);
+}
+
 emoji-slider:nth-of-type(2) {
   background: #d69;
   --emoji-slider-text-color: #ffeedc;
