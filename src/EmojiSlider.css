@@ -111,7 +111,7 @@
   top: -32px;
   opacity: 1;
   visibility: visible;
-  transition: top 0s, visibility 0s;
+  transition: top 0s, visibility 0s, opacity 0s;
 }
 
 @keyframes float {
