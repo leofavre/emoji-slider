@@ -101,15 +101,17 @@
   position: relative;
   display: block;
   top: -320px;
+  left: -9999px;
   opacity: 0;
-  transition: top 1s ease-in, opacity 0.3s 0.7s ease-in;
+  transition: top 1s ease-in, left 0s 1s, opacity 0.3s 0.7s ease-in;
 }
 
 .root_active .floater {
   top: -32px;
+  left: 0;
   opacity: 1;
   animation: float 2.2s ease-in-out infinite;
-  transition: top 0s;
+  transition: top 0s, left 0s;
 }
 
 @keyframes float {
@@ -143,7 +145,6 @@
 
   font-size: 32px;
   line-height: 0.75;
-  z-index: 2;
 }
 
 .emoji_scaled {

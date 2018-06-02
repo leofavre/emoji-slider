@@ -21,7 +21,6 @@ export class EmojiSlider extends HTMLElement {
     this.handleSlideStart = this.handleSlideStart.bind(this);
     this.handleSlide = this.handleSlide.bind(this);
     this.handleSlideEnd = this.handleSlideEnd.bind(this);
-    this.removeTheme = this.removeTheme.bind(this);
   }
 
   static get observedAttributes () {
@@ -34,6 +33,14 @@ export class EmojiSlider extends HTMLElement {
 
   set rate (value) {
     this.setAttribute('rate', value);
+  }
+
+  get emoji () {
+    return this.getAttribute('emoji') || '😍';
+  }
+
+  set emoji (value) {
+    this.setAttribute('emoji', value);
   }
 
   attributeChangedCallback (attrName, oldValue, newValue) {
@@ -102,7 +109,7 @@ export class EmojiSlider extends HTMLElement {
 
     const luminance = getLuminance(bgColor);
 
-    THEMES.forEach(this.removeTheme);
+    THEMES.forEach(this.removeTheme.bind(this));
 
     if (luminance < 95) {
       this.applyTheme('dark');
@@ -114,9 +121,8 @@ export class EmojiSlider extends HTMLElement {
   }
 
   updateEmoji () {
-    const emoji = this.getAttribute('emoji') || '😍';
-    this.$emojiFixed.innerHTML = emoji;
-    this.$emojiScale.innerHTML = emoji;
+    this.$emojiFixed.innerHTML = this.emoji;
+    this.$emojiScale.innerHTML = this.emoji;
   }
 
   updateRate () {
@@ -126,8 +132,11 @@ export class EmojiSlider extends HTMLElement {
     this.$emojiScale.style = '';
     this.$emojiScale.style.fontSize = `${32 + this.rate}px`;
 
-    this.$sliderLeft.style.clipPath = `polygon(0 0, ${this.rate}% 0, ${this.rate}% 100%, 0% 100%)`;
-    this.$sliderRight.style.clipPath = `polygon(${this.rate}% 0, 100% 0, 100% 100%, ${this.rate}% 100%)`;
+    this.$sliderLeft.style.clipPath =
+      `polygon(0 0, ${this.rate}% 0, ${this.rate}% 100%, 0% 100%)`;
+
+    this.$sliderRight.style.clipPath =
+      `polygon(${this.rate}% 0, 100% 0, 100% 100%, ${this.rate}% 100%)`;
   }
 
   dispatchEventAndMethod (evtName, detail) {
