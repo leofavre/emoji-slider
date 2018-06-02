@@ -1,8 +1,6 @@
 import template from './template.js';
 import { getLuminance } from './helpers.js';
 
-const THEMES = [ 'white', 'light', 'dark' ];
-
 export class EmojiSlider extends HTMLElement {
   constructor () {
     super();
@@ -21,6 +19,10 @@ export class EmojiSlider extends HTMLElement {
     this.handleSlideStart = this.handleSlideStart.bind(this);
     this.handleSlide = this.handleSlide.bind(this);
     this.handleSlideEnd = this.handleSlideEnd.bind(this);
+  }
+
+  static get availableThemes () {
+    return [ 'white', 'light', 'dark' ];
   }
 
   static get observedAttributes () {
@@ -109,14 +111,18 @@ export class EmojiSlider extends HTMLElement {
 
     const luminance = getLuminance(bgColor);
 
-    THEMES.forEach(this.removeTheme.bind(this));
+    const themes = this.constructor.availableThemes;
+
+    themes.forEach(theme => {
+      this.removeTheme(theme);
+    });
 
     if (luminance < 95) {
-      this.applyTheme('dark');
+      this.applyTheme(themes[2]);
     } else if (luminance < 190) {
-      this.applyTheme('light');
+      this.applyTheme(themes[1]);
     } else {
-      this.applyTheme('white');
+      this.applyTheme(themes[0]);
     }
   }
 
