@@ -13,8 +13,10 @@ template.innerHTML = `
         </div>
         <div class="emoji emoji_fixed"></div>
       </div>
-      <div class="slider slider_left"></div>
-      <div class="slider slider_right"></div>
+      <div class="slider">
+        <div class="area area_left"></div>
+        <div class="area area_right"></div>
+      </div>
     </div>
   </div>
 `;

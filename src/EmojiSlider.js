@@ -13,8 +13,8 @@ export class EmojiSlider extends HTMLElement {
     this.$emojiThumb = select('thumb');
     this.$emojiFixed = select('emoji_fixed');
     this.$emojiScale = select('emoji_scaled');
-    this.$barLeft = select('slider_left');
-    this.$barRight = select('slider_right');
+    this.$sliderLeft = select('area_left');
+    this.$sliderRight = select('area_right');
 
     this.handleSlideStart = this.handleSlideStart.bind(this);
     this.handleSlide = this.handleSlide.bind(this);
@@ -89,8 +89,8 @@ export class EmojiSlider extends HTMLElement {
     this.$emojiScale.style = '';
     this.$emojiScale.style.fontSize = `${32 + this.rate}px`;
 
-    this.$barLeft.style.width = `${this.rate}%`;
-    this.$barRight.style.width = `${100 - this.rate}%`;
+    this.$sliderLeft.style.clipPath = `polygon(0 0, ${this.rate}% 0, ${this.rate}% 100%, 0% 100%)`;
+    this.$sliderRight.style.clipPath = `polygon(${this.rate}% 0, 100% 0, 100% 100%, ${this.rate}% 100%)`;
   }
 
   dispatchEventAndMethod (evtName, detail) {
