@@ -124,13 +124,6 @@ export class EmojiSlider extends HTMLElement {
   updateAppearance () {
     const computedStyles = window.getComputedStyle(this, null);
 
-    /* update rotation */
-
-    const transform = computedStyles.getPropertyValue('transform');
-    const rotation = getRotationInDeg(transform);
-    this.$emojiThumb.style.transform = `rotate(${rotation * -1}deg)`;
-    this.$emojiFixed.style.transform = `rotate(${rotation}deg)`;
-
     /* update theme */
 
     const bgColor = computedStyles.getPropertyValue('background-color');
@@ -148,6 +141,13 @@ export class EmojiSlider extends HTMLElement {
     } else {
       this.applyTheme(themes[0]);
     }
+
+    /* update rotation */
+
+    const transform = computedStyles.getPropertyValue('transform');
+    const rotation = getRotationInDeg(transform);
+    this.$emojiThumb.style.transform = `rotate(${rotation * -1}deg)`;
+    this.$emojiFixed.style.transform = `rotate(${rotation}deg)`;
   }
 
   updateEmoji () {
