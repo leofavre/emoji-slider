@@ -154,11 +154,8 @@ export class EmojiSlider extends HTMLElement {
     this.$emojiScale.style = '';
     this.$emojiScale.style.fontSize = `${32 + this.rate}px`;
 
-    this.$sliderLeft.style.clipPath =
-      `polygon(0 0, ${this.rate}% 0, ${this.rate}% 100%, 0% 100%)`;
-
-    this.$sliderRight.style.clipPath =
-      `polygon(${this.rate}% 0, 100% 0, 100% 100%, ${this.rate}% 100%)`;
+    this.$sliderLeft.style.width = `${this.rate}%`;
+    this.$sliderRight.style.width = `${100 - this.rate}%`;
   }
 
   dispatchEventAndMethod (evtName, detail) {

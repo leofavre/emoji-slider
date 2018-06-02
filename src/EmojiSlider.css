@@ -66,8 +66,7 @@
 .area {
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
+  width: 100%; /* changed by javascript */
   height: 8px;
   overflow: hidden;
   pointer-events: none;
@@ -77,8 +76,12 @@
   border-radius: 4px;
 }
 
-.area {
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); /* changed by javascript */
+.area_left {
+  left: 0;
+}
+
+.area_right {
+  right: 0;
 }
 
 .area_right,
