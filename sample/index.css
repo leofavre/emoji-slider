@@ -11,3 +11,13 @@ body > * {
 img {
   width: 320px;
 }
+
+emoji-slider:nth-child(2) {
+  background: #d69;
+  --emoji-slider-text-color: #ffeedc;
+  --emoji-slider-bar-color: #ffeedc;
+}
+
+emoji-slider:nth-child(3) {
+  background: #409;
+}

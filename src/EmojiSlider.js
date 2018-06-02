@@ -1,4 +1,5 @@
 import template from './template.js';
+import { getLuminance } from './helpers.js';
 
 export class EmojiSlider extends HTMLElement {
   constructor () {
@@ -7,8 +8,8 @@ export class EmojiSlider extends HTMLElement {
     this.shadowRoot.appendChild(template.content.cloneNode(true));
 
     this.$wrapper = this.shadowRoot.querySelector('.wrapper');
-    this.$emojiThumb = this.shadowRoot.querySelector('.emoji_thumb');
-    this.$emojiScale = this.shadowRoot.querySelector('.emoji_scale');
+    this.$emojiThumb = this.shadowRoot.querySelector('.emoji__thumb');
+    this.$emojiScale = this.shadowRoot.querySelector('.emoji__scale');
     this.$barLeft = this.shadowRoot.querySelector('.bar__area_left');
     this.$barRight = this.shadowRoot.querySelector('.bar__area_right');
 
@@ -43,14 +44,33 @@ export class EmojiSlider extends HTMLElement {
 
   connectedCallback () {
     this.$emojiThumb.addEventListener('mousedown', this.handleSlideStart);
+
     this.updateEmoji();
     this.updateRate();
 
-    this.$emojiScale.style.transition = 'opacity 0s';
+    setTimeout(() => {
+      this.$wrapper.classList.add('wrapper_started');
+      this.setTheme();
+    }, 100);
+  }
 
-    this.setTimeout(() => {
-      this.$emojiScale.style = '';
-    }, 50);
+  setTheme () {
+    const bgColor = window.getComputedStyle(this, null)
+      .getPropertyValue('background-color');
+
+    const luminance = getLuminance(bgColor);
+
+    let theme;
+
+    if (luminance < 112) {
+      theme = 'wrapper_theme_dark';
+    } else if (luminance < 234) {
+      theme = 'wrapper_theme_light';
+    } else {
+      theme = 'wrapper_theme_white';
+    }
+
+    this.$wrapper.classList.add(theme);
   }
 
   updateEmoji () {
@@ -65,8 +85,8 @@ export class EmojiSlider extends HTMLElement {
 
     this.$emojiScale.style = '';
     this.$emojiScale.style.left = `${this.rate}%`;
-    this.$emojiScale.style.bottom = `${0.35 - (0.35 * this.rate / 100)}em`;
-    this.$emojiScale.style.fontSize = `${2 + this.rate / 25}em`;
+    this.$emojiScale.style.bottom = `${0.5 - (0.5 * this.rate / 100)}em`;
+    this.$emojiScale.style.fontSize = `${2 + this.rate / 20}em`;
 
     this.$barLeft.style.width = `${this.rate}%`;
     this.$barRight.style.width = `${100 - this.rate}%`;
@@ -76,7 +96,7 @@ export class EmojiSlider extends HTMLElement {
     this.startX = evt.pageX;
     this.startRate = this.rate;
 
-    this.$emojiScale.classList.add('emoji_active');
+    this.$wrapper.classList.add('wrapper_active');
     document.addEventListener('mousemove', this.handleSlide);
     document.addEventListener('mouseup', this.handleSlideEnd);
   }
@@ -91,12 +111,13 @@ export class EmojiSlider extends HTMLElement {
   }
 
   handleSlideEnd (evt) {
-    this.$emojiScale.classList.remove('emoji_active');
+    this.$wrapper.classList.remove('wrapper_active');
     document.removeEventListener('mouseup', this.handleSlideEnd);
     document.removeEventListener('mousemove', this.handleSlide);
   }
 
   disconnectedCallback () {
+    this.$wrapper.classList.remove('wrapper_started');
     this.$emojiThumb.removeEventListener('mousedown', this.handleSlideStart);
     document.removeEventListener('mouseup', this.handleSlideEnd);
     document.removeEventListener('mousemove', this.handleSlide);
