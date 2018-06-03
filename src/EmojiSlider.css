@@ -173,7 +173,7 @@
 }
 
 .root_started .emoji_scaled {
-  transition: opacity 0.2s 2s;
+  transition: opacity 0.2s 0.8s;
 }
 
 .root_active .emoji_scaled {
