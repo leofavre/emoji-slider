@@ -21,10 +21,6 @@ export class EmojiSlider extends HTMLElement {
     this.handleSlideEnd = this.handleSlideEnd.bind(this);
   }
 
-  static get availableThemes () {
-    return [ 'white', 'light', 'dark' ];
-  }
-
   static get observedAttributes () {
     return ['rate', 'emoji'];
   }
@@ -114,11 +110,10 @@ export class EmojiSlider extends HTMLElement {
   }
 
   applyTheme (theme) {
-    this.$root.classList.add(`root_theme_${theme}`);
-  }
+    this.$root.className = this.$root.className
+      .replace(/( |^)root_theme_.*?( |$)/gm, '$1');
 
-  removeTheme (theme) {
-    this.$root.classList.remove(`root_theme_${theme}`);
+    this.$root.classList.add(`root_theme_${theme}`);
   }
 
   updateAppearance () {
@@ -128,18 +123,13 @@ export class EmojiSlider extends HTMLElement {
 
     const bgColor = computedStyles.getPropertyValue('background-color');
     const luminance = getLuminance(bgColor);
-    const themes = this.constructor.availableThemes;
-
-    themes.forEach(theme => {
-      this.removeTheme(theme);
-    });
 
     if (luminance < 95) {
-      this.applyTheme(themes[2]);
-    } else if (luminance < 190) {
-      this.applyTheme(themes[1]);
+      this.applyTheme('dark');
+    } else if (luminance < 170) {
+      this.applyTheme('light');
     } else {
-      this.applyTheme(themes[0]);
+      this.applyTheme('white');
     }
 
     /* update rotation */
