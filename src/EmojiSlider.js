@@ -115,7 +115,7 @@ export class EmojiSlider extends HTMLElement {
   }
 
   applyTheme (theme) {
-    removeClassesStartingWith('root_theme', this.$root);
+    removeClassesStartingWith('root_theme_', this.$root);
     this.$root.classList.add(`root_theme_${theme}`);
   }
 
