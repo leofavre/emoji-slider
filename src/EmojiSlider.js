@@ -1,7 +1,10 @@
 import template from './template.js';
-import { getLuminance } from './helpers.js';
 
-const THEMES = [ 'white', 'light', 'dark' ];
+import {
+  getLuminance,
+  getRotationInDeg,
+  removeClassesStartingWith
+} from './helpers.js';
 
 export class EmojiSlider extends HTMLElement {
   constructor () {
@@ -12,12 +15,15 @@ export class EmojiSlider extends HTMLElement {
     const select = str => this.shadowRoot.querySelector(`.${str}`);
 
     this.$root = select('root');
-    this.$input = select('input');
+    this.$slider = select('input');
     this.$emojiThumb = select('thumb');
     this.$emojiFixed = select('emoji_fixed');
     this.$emojiScale = select('emoji_scaled');
     this.$sliderLeft = select('area_left');
     this.$sliderRight = select('area_right');
+
+    this.handleSlide = this.handleSlide.bind(this);
+    this.handleSlideEnd = this.handleSlideEnd.bind(this);
   }
 
   static get observedAttributes () {
@@ -53,14 +59,19 @@ export class EmojiSlider extends HTMLElement {
   }
 
   connectedCallback () {
-    this.$input.addEventListener('mousedown', this.handleSlideStart.bind(this));
-    this.$input.addEventListener('input', this.handleSlide.bind(this));
-    this.$input.addEventListener('mouseup', this.handleSlideEnd.bind(this));
-    this.$input.value = this.rate;
+    this.$slider.addEventListener('input', this.handleSlide);
+    this.$slider.addEventListener('change', this.handleSlideEnd);
+    this.$slider.addEventListener('mouseout', this.handleSlideEnd);
+    this.$slider.addEventListener('touchend', this.handleSlideEnd);
+
+    this.upgradeProperty('rate');
+    this.upgradeProperty('emoji');
+
+    this.$slider.value = this.rate;
 
     this.updateEmoji();
     this.updateRate();
-    this.updateTheme();
+    this.updateAppearance();
     this.observeStyleChange();
 
     setTimeout(() => {
@@ -68,10 +79,18 @@ export class EmojiSlider extends HTMLElement {
     }, 100);
   }
 
+  upgradeProperty (propName) {
+    if (this.hasOwnProperty(propName)) {
+      let value = this[propName];
+      delete this[propName];
+      this[propName] = value;
+    }
+  }
+
   observeStyleChange () {
     this.observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
-        this.updateTheme();
+        this.updateAppearance();
       });
     });
 
@@ -96,28 +115,32 @@ export class EmojiSlider extends HTMLElement {
   }
 
   applyTheme (theme) {
+    removeClassesStartingWith('root_theme_', this.$root);
     this.$root.classList.add(`root_theme_${theme}`);
   }
 
-  removeTheme (theme) {
-    this.$root.classList.remove(`root_theme_${theme}`);
-  }
+  updateAppearance () {
+    const computedStyles = window.getComputedStyle(this, null);
 
-  updateTheme () {
-    const bgColor = window.getComputedStyle(this, null)
-      .getPropertyValue('background-color');
+    /* update theme */
 
+    const bgColor = computedStyles.getPropertyValue('background-color');
     const luminance = getLuminance(bgColor);
 
-    THEMES.forEach(this.removeTheme.bind(this));
-
     if (luminance < 95) {
-      this.applyTheme(THEMES[2]);
-    } else if (luminance < 190) {
-      this.applyTheme(THEMES[1]);
+      this.applyTheme('dark');
+    } else if (luminance < 170) {
+      this.applyTheme('light');
     } else {
-      this.applyTheme(THEMES[0]);
+      this.applyTheme('white');
     }
+
+    /* update rotation */
+
+    const transform = computedStyles.getPropertyValue('transform');
+    const rotation = getRotationInDeg(transform);
+    this.$emojiThumb.style.transform = `rotate(${rotation * -1}deg)`;
+    this.$emojiFixed.style.transform = `rotate(${rotation}deg)`;
   }
 
   updateEmoji () {
@@ -126,17 +149,10 @@ export class EmojiSlider extends HTMLElement {
   }
 
   updateRate () {
-    this.$emojiThumb.style = '';
     this.$emojiThumb.style.left = `${this.rate}%`;
-
-    this.$emojiScale.style = '';
     this.$emojiScale.style.fontSize = `${32 + this.rate}px`;
-
-    this.$sliderLeft.style.clipPath =
-      `polygon(0 0, ${this.rate}% 0, ${this.rate}% 100%, 0% 100%)`;
-
-    this.$sliderRight.style.clipPath =
-      `polygon(${this.rate}% 0, 100% 0, 100% 100%, ${this.rate}% 100%)`;
+    this.$sliderLeft.style.width = `${this.rate}%`;
+    this.$sliderRight.style.width = `${100 - this.rate}%`;
   }
 
   dispatchEventAndMethod (evtName, detail) {
@@ -154,23 +170,28 @@ export class EmojiSlider extends HTMLElement {
     }
   }
 
-  handleSlideStart (evt) {
-    this.applyState('active');
-  }
-
   handleSlide (evt) {
+    this.applyState('active');
     this.rate = evt.target.value;
   }
 
-  handleSlideEnd (evt) {
+  handleSlideEnd () {
     this.removeState('active');
-    this.dispatchEventAndMethod('rate', { rate: evt.target.value });
+
+    if (this.rate !== this.previousRate) {
+      this.dispatchEventAndMethod('rate', {
+        rate: this.rate
+      });
+    }
+
+    this.previousRate = this.rate;
   }
 
   disconnectedCallback () {
     this.stopObservingStyleChanges();
-    this.$input.removeEventListener('mousedown', this.handleSlideEnd);
-    this.$input.removeEventListener('input', this.handleSlide);
-    this.$input.removeEventListener('mouseup', this.handleSlideEnd);
+    this.$slider.removeEventListener('input', this.handleSlide);
+    this.$slider.removeEventListener('change', this.handleSlideEnd);
+    this.$slider.removeEventListener('mouseout', this.handleSlideEnd);
+    this.$slider.removeEventListener('touchend', this.handleSlideEnd);
   }
 }

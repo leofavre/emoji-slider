@@ -52,8 +52,6 @@
 }
 
 .input {
-  -webkit-appearance: none;
-
   position: absolute;
   top: -13px;
   left: -8px;
@@ -61,7 +59,6 @@
   width: calc(100% + 16px);
   height: 32px;
   opacity: 0;
-  z-index: 5;
   cursor: pointer;
 }
 
@@ -69,18 +66,22 @@
 .area {
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
+  width: 100%; /* changed by javascript */
   height: 8px;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .slider {
   border-radius: 4px;
 }
 
-.area {
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%); /* changed by javascript */
+.area_left {
+  left: 0;
+}
+
+.area_right {
+  right: 0;
 }
 
 .area_right,
@@ -106,9 +107,13 @@
 /* thumb */
 
 .thumb {
-  position: relative;
-  top: 50%;
+  position: absolute;
+  top: 0%;
   left: 0%; /* changed by javascript */
+  width: 32px;
+  height: 32px;
+  margin-top: -10px;
+  margin-left: -16px;
 }
 
 .floater {
@@ -116,14 +121,16 @@
   display: block;
   top: -320px;
   opacity: 0;
-  transition: top 1s ease-in, opacity 0.3s 0.7s ease-in;
+  visibility: hidden;
+  transition: top 1s ease-in, visibility 0s 1s, opacity 0.3s 0.7s ease-in;
+  animation: float 2.2s ease-in-out infinite;
 }
 
 .root_active .floater {
-  top: -32px;
+  top: -16px;
   opacity: 1;
-  animation: float 2.2s ease-in-out infinite;
-  transition: top 0s;
+  visibility: visible;
+  transition: top 0s, visibility 0s, opacity 0s;
 }
 
 @keyframes float {
@@ -151,13 +158,12 @@
   justify-content: center;
 
   top: 50%;
-  left: 0%;
+  left: 50%;
   width: 0;
   height: 0;
 
   font-size: 32px;
   line-height: 0.75;
-  z-index: 2;
 }
 
 .emoji_scaled {
