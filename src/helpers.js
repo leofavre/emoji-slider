@@ -27,3 +27,8 @@ export const getRotationInDeg = str => {
   const [argA = 0, argB = 0] = parseTransform(str);
   return Math.round(Math.atan2(argB, argA) * (180 / Math.PI));
 };
+
+export const removeClassesStartingWith = (str, element) => {
+  const pattern = new RegExp(`( |^)${str}_.*?( |$)`, 'gm');
+  element.className = element.className.replace(pattern, '$1');
+};

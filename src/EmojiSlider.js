@@ -1,5 +1,10 @@
 import template from './template.js';
-import { getLuminance, getRotationInDeg } from './helpers.js';
+
+import {
+  getLuminance,
+  getRotationInDeg,
+  removeClassesStartingWith
+} from './helpers.js';
 
 export class EmojiSlider extends HTMLElement {
   constructor () {
@@ -110,9 +115,7 @@ export class EmojiSlider extends HTMLElement {
   }
 
   applyTheme (theme) {
-    this.$root.className = this.$root.className
-      .replace(/( |^)root_theme_.*?( |$)/gm, '$1');
-
+    removeClassesStartingWith('root_theme', this.$root);
     this.$root.classList.add(`root_theme_${theme}`);
   }
 
