@@ -185,7 +185,6 @@ export class EmojiSlider extends HTMLElement {
   }
 
   disconnectedCallback () {
-    this.removeState('started');
     this.stopObservingStyleChanges();
     this.$slider.removeEventListener('input', this.handleSlide);
     this.$slider.removeEventListener('change', this.handleSlideEnd);
