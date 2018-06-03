@@ -27,7 +27,7 @@ export class EmojiSlider extends HTMLElement {
   }
 
   static get observedAttributes () {
-    return ['rate', 'emoji'];
+    return ['rate', 'emoji', 'style', 'class'];
   }
 
   get rate () {
@@ -54,6 +54,10 @@ export class EmojiSlider extends HTMLElement {
 
       if (attrName === 'emoji') {
         this.updateEmoji();
+      }
+
+      if (attrName === 'style' || attrName === 'class') {
+        this.updateAppearance();
       }
     }
   }
@@ -85,25 +89,6 @@ export class EmojiSlider extends HTMLElement {
       delete this[propName];
       this[propName] = value;
     }
-  }
-
-  observeStyleChange () {
-    this.observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        this.updateAppearance();
-      });
-    });
-
-    var observerConfig = {
-      attributes: true,
-      attributeFilter: ['style', 'class']
-    };
-
-    this.observer.observe(this, observerConfig);
-  }
-
-  stopObservingStyleChanges () {
-    this.observer.disconnect();
   }
 
   applyState (state) {
@@ -188,7 +173,6 @@ export class EmojiSlider extends HTMLElement {
   }
 
   disconnectedCallback () {
-    this.stopObservingStyleChanges();
     this.$slider.removeEventListener('input', this.handleSlide);
     this.$slider.removeEventListener('change', this.handleSlideEnd);
     this.$slider.removeEventListener('mouseout', this.handleSlideEnd);
