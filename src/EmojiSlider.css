@@ -122,8 +122,11 @@
   top: -320px;
   opacity: 0;
   visibility: hidden;
-  transition: top 1s ease-in, visibility 0s 1s, opacity 0.3s 0.7s ease-in;
   animation: float 2.2s ease-in-out infinite;
+}
+
+.root_started .floater {
+  transition: top 1s ease-in, opacity 0.3s 0.7s ease-in, visibility 0s 1s;
 }
 
 .root_active .floater {
@@ -169,14 +172,4 @@
 .emoji_scaled {
   font-size: 32px; /* changed by javascript */
   align-items: flex-end;
-  opacity: 0;
-}
-
-.root_started .emoji_scaled {
-  transition: opacity 0.2s 0.8s;
-}
-
-.root_active .emoji_scaled {
-  opacity: 1;
-  transition: opacity 0s;
 }
