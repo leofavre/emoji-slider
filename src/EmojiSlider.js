@@ -78,7 +78,7 @@ export class EmojiSlider extends HTMLElement {
     this.updateAppearance();
 
     setTimeout(() => {
-      this.applyState('started');
+      this.$root.classList.add('root_started');
     }, 100);
   }
 
@@ -88,14 +88,6 @@ export class EmojiSlider extends HTMLElement {
       delete this[propName];
       this[propName] = value;
     }
-  }
-
-  applyState (state) {
-    this.$root.classList.add(`root_${state}`);
-  }
-
-  removeState (state) {
-    this.$root.classList.remove(`root_${state}`);
   }
 
   applyTheme (theme) {
@@ -155,12 +147,12 @@ export class EmojiSlider extends HTMLElement {
   }
 
   handleSlide (evt) {
-    this.applyState('active');
+    this.$root.classList.add('root_active');
     this.rate = evt.target.value;
   }
 
   handleSlideEnd () {
-    this.removeState('active');
+    this.$root.classList.remove('root_active');
 
     if (this.rate !== this.previousRate) {
       this.dispatchEventAndMethod('rate', {
@@ -172,6 +164,7 @@ export class EmojiSlider extends HTMLElement {
   }
 
   disconnectedCallback () {
+    this.$root.classList.remove('root_started');
     this.$slider.removeEventListener('input', this.handleSlide);
     this.$slider.removeEventListener('change', this.handleSlideEnd);
     this.$slider.removeEventListener('mouseout', this.handleSlideEnd);
