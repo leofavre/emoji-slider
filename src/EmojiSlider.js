@@ -76,7 +76,6 @@ export class EmojiSlider extends HTMLElement {
     this.updateEmoji();
     this.updateRate();
     this.updateAppearance();
-    this.observeStyleChange();
 
     setTimeout(() => {
       this.applyState('started');
