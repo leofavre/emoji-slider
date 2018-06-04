@@ -29,6 +29,6 @@ export const getRotationInDeg = str => {
 };
 
 export const removeClassesStartingWith = (str, element) => {
-  const pattern = new RegExp(`( |^)${str}_.*?( |$)`, 'gm');
+  const pattern = new RegExp(`( |^)${str}.*?( |$)`, 'gm');
   element.className = element.className.replace(pattern, '$1');
 };
